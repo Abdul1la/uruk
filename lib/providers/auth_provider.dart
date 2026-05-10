@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
+import '../services/fcm_service.dart';
 
 enum AuthState {
   unauthenticated,
@@ -29,6 +32,47 @@ class AuthProvider extends ChangeNotifier {
 
   final _service = ApiService();
 
+  /// The FCM token we last sent to the backend, kept so we can:
+  ///  - skip duplicate POSTs when the token hasn't changed,
+  ///  - tell the backend to forget it on logout.
+  String? _lastRegisteredToken;
+
+  /// Subscription to FCM's token-rotation stream. iOS rotates the APNs token
+  /// occasionally and Android can refresh on app data clear / reinstall, so
+  /// we re-register whenever it fires.
+  StreamSubscription<String>? _tokenRefreshSub;
+
+  AuthProvider() {
+    _tokenRefreshSub = FcmService.instance.tokenStream.listen((token) {
+      // Only forward to the backend once the user is actually signed in.
+      // Otherwise the token is registered the moment the user logs in.
+      if (_user != null) _registerDeviceForPush(token);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tokenRefreshSub?.cancel();
+    super.dispose();
+  }
+
+  /// POST the current FCM token to the backend so the server can target this
+  /// device. Best-effort — we never block login on this call.
+  Future<void> _registerDeviceForPush([String? overrideToken]) async {
+    try {
+      final token = overrideToken ?? await FcmService.instance.getToken();
+      if (token == null || token.isEmpty) return;
+      if (token == _lastRegisteredToken) return;
+      final ok = await _service.registerDeviceToken(
+        token: token,
+        platform: FcmService.instance.platform,
+      );
+      if (ok) _lastRegisteredToken = token;
+    } catch (_) {
+      // Push registration must never break auth.
+    }
+  }
+
   /// Map a user's backend status onto an AuthState. Used by [login],
   /// [register] and [refreshUser] so the three paths stay consistent.
   AuthState _stateForStatus(UserStatus status) {
@@ -51,6 +95,9 @@ class AuthProvider extends ChangeNotifier {
       if (user != null) {
         _user = user;
         _setState(_stateForStatus(user.status));
+        // Tell the backend which device this user just signed in on.
+        // Fire-and-forget: navigation never blocks on this.
+        unawaited(_registerDeviceForPush());
         // Callers can check isAuthenticated to decide on navigation. A
         // suspended / rejected user is NOT considered "logged in".
         return user.status == UserStatus.approved ||
@@ -107,6 +154,7 @@ class AuthProvider extends ChangeNotifier {
         email: email,
       );
       _setState(_stateForStatus(_user!.status));
+      unawaited(_registerDeviceForPush());
       return true;
     } catch (_) {
       _errorMessage = 'Registration failed. Please try again.';
@@ -125,6 +173,9 @@ class AuthProvider extends ChangeNotifier {
       final user = await _service.getProfile();
       _user = user;
       _setState(_stateForStatus(user.status));
+      // Re-register on cold start so a freshly rotated token reaches the
+      // backend even if the previous run never got a chance to push it.
+      unawaited(_registerDeviceForPush());
       return true;
     } catch (_) {
       return false;
@@ -230,6 +281,15 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void logout() {
+    // Tell the backend to forget this device first, then drop the FCM token
+    // locally so the next login negotiates a fresh one.
+    final tokenToRevoke = _lastRegisteredToken;
+    if (tokenToRevoke != null) {
+      unawaited(_service.unregisterDeviceToken(tokenToRevoke));
+    }
+    unawaited(FcmService.instance.deleteToken());
+    _lastRegisteredToken = null;
+
     _user = null;
     _otpSent = false;
     _errorMessage = null;

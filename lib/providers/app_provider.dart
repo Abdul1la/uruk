@@ -338,6 +338,16 @@ class AppProvider extends ChangeNotifier {
     await _service.markAllNotificationsRead(userId);
   }
 
+  /// Insert a push notification that just arrived via FCM into the in-memory
+  /// list so the bell badge ([unreadCount]) and the notifications screen
+  /// update without waiting for the next pull from the server. Idempotent —
+  /// re-delivery of the same FCM message id is ignored.
+  void addIncomingNotification(NotificationModel n) {
+    if (_notifications.any((existing) => existing.id == n.id)) return;
+    _notifications = [n, ..._notifications];
+    notifyListeners();
+  }
+
   Future<void> loadCarChangeRequests(String userId) async {
     _carChangeRequests = await _service.getCarChangeRequests(userId);
     _safeNotify();

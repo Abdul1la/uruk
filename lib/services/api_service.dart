@@ -400,6 +400,43 @@ class ApiService {
   }
 
   // ════════════════════════════════════════════════════
+  // DEVICE TOKENS (FCM)
+  // ════════════════════════════════════════════════════
+
+  /// Register an FCM device token with the backend so the server can target
+  /// this device for push notifications. Fire-and-forget — silently swallows
+  /// errors so a transient network blip doesn't break login.
+  ///
+  /// Backend contract: `POST /devices/register { token, platform }`
+  /// (auth header carries the user id).
+  Future<bool> registerDeviceToken({
+    required String token,
+    required String platform,
+  }) async {
+    try {
+      await _post('/devices/register', {
+        'token': token,
+        'platform': platform,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Tell the backend to forget this device token (e.g. on logout).
+  ///
+  /// Backend contract: `POST /devices/unregister { token }`.
+  Future<bool> unregisterDeviceToken(String token) async {
+    try {
+      await _post('/devices/unregister', {'token': token});
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ════════════════════════════════════════════════════
   // REQUESTS
   // ════════════════════════════════════════════════════
 

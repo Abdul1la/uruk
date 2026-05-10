@@ -292,6 +292,21 @@ class MockService {
     return true;
   }
 
+  // ── Device tokens (FCM) ───────────────────────────────────────────────────
+
+  Future<bool> registerDeviceToken({
+    required String token,
+    required String platform,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    return true;
+  }
+
+  Future<bool> unregisterDeviceToken(String token) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    return true;
+  }
+
   // ── Support Info ─────────────────────────────────────────────────────────
 
   Future<SupportInfo> getSupportInfo() async {
