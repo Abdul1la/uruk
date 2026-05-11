@@ -1,0 +1,10 @@
+node_modules/
+.env
+uploads/ids/*
+uploads/cars/*
+uploads/accidents/*
+uploads/repairs/*
+uploads/payments/*
+uploads/banners/*
+uploads/general/*
+!uploads/**/.gitkeep

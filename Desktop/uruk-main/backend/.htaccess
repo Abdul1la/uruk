@@ -1,0 +1,8 @@
+# Spaceship Supreme / cPanel Node.js app
+# This file redirects all traffic to the Node.js app via Passenger
+
+DirectoryIndex disabled
+RewriteEngine On
+
+# Redirect all requests to the Node.js app
+RewriteRule ^(.*)$ http://127.0.0.1:%{ENV:PORT}/$1 [P,L]

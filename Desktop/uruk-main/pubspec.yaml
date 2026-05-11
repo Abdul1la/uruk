@@ -2,7 +2,7 @@ name: uruk_motors
 description: "Uruk Motors - Car Maintenance Subscription App"
 publish_to: 'none'
 
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

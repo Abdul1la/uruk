@@ -1,0 +1,299 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="تطبيق اشتراك صيانة السيارات — أوروك موتورز">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="أوروك">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Theme color for address bar -->
+  <meta name="theme-color" content="#1A3A8F">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <title>أوروك موتورز</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!--  PWA install button — floating pill at the bottom                    -->
+  <!--  Shows automatically when the browser fires beforeinstallprompt, or  -->
+  <!--  on iOS Safari it shows an instructions sheet (Share → Add to Home). -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <style>
+    /* Small, unobtrusive install icon — top-left corner (RTL top-right),
+       only visible before the user signs in. Once authenticated, the script
+       hides it so it never shows inside the app. */
+    #uruk-install-btn {
+      position: fixed;
+      top: 12px;
+      inset-inline-start: 12px;
+      z-index: 999999;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px; height: 38px;
+      padding: 0;
+      background: rgba(26, 58, 143, 0.92);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+      transition: transform 200ms ease, opacity 200ms ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #uruk-install-btn.visible {
+      opacity: 0.88;
+      pointer-events: auto;
+    }
+    #uruk-install-btn:hover { opacity: 1; transform: scale(1.05); }
+    #uruk-install-btn span:not(.dismiss) { display: none; }
+    #uruk-install-btn .dismiss { display: none; }
+
+    /* iOS instruction sheet */
+    #uruk-ios-sheet-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 1000000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      animation: fade-in 200ms ease;
+    }
+    #uruk-ios-sheet-bg.visible { display: flex; }
+    #uruk-ios-sheet {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 22px 34px;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+      color: #1f2937;
+      direction: rtl;
+      animation: slide-up 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    #uruk-ios-sheet h3 {
+      margin: 0 0 10px;
+      font-size: 17px; font-weight: 700; color: #1A3A8F;
+    }
+    #uruk-ios-sheet p { margin: 6px 0; font-size: 13.5px; line-height: 1.7; }
+    #uruk-ios-sheet .step {
+      display: flex; gap: 10px; align-items: flex-start;
+      margin: 10px 0; padding: 10px; background: #F5F7FB;
+      border-radius: 10px;
+    }
+    #uruk-ios-sheet .step .num {
+      flex: 0 0 24px; height: 24px; border-radius: 50%;
+      background: #1A3A8F; color: #fff; display: inline-flex;
+      align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+    }
+    #uruk-ios-sheet button {
+      margin-top: 14px; width: 100%;
+      padding: 12px; border: none; border-radius: 12px;
+      background: #1A3A8F; color: #fff; font-size: 14px;
+      font-weight: 700; cursor: pointer;
+    }
+
+    @keyframes fade-in { from {opacity:0} to {opacity:1} }
+    @keyframes slide-up { from {transform: translateY(100%)} to {transform: translateY(0)} }
+  </style>
+  <style id="splash-screen-style">
+    html {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background-color: #FFFFFF;
+          background-size: 100% 100%;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .contain {
+      display:block;
+      width:100%; height:100%;
+      object-fit: contain;
+    }
+
+    .stretch {
+      display:block;
+      width:100%; height:100%;
+    }
+
+    .cover {
+      display:block;
+      width:100%; height:100%;
+      object-fit: cover;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+    }
+
+    .bottomLeft {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .bottomRight {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <script id="splash-screen-script">
+    function removeSplashFromWeb() {
+      document.getElementById("splash")?.remove();
+      document.getElementById("splash-branding")?.remove();
+      document.body.style.background = "transparent";
+    }
+  </script>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+</head>
+<body>
+  <picture id="splash">
+      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
+      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
+      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
+  </picture>
+
+  <!-- Install button -->
+  <button id="uruk-install-btn" type="button" aria-label="تثبيت التطبيق على الشاشة الرئيسية">
+    <!-- Download / install icon -->
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    <span>تثبيت التطبيق</span>
+    <span class="dismiss" role="button" aria-label="إغلاق" data-dismiss="1">×</span>
+  </button>
+
+  <!-- iOS instruction sheet -->
+  <div id="uruk-ios-sheet-bg" role="dialog" aria-modal="true">
+    <div id="uruk-ios-sheet">
+      <h3>تثبيت أوروك موتورز على شاشتك الرئيسية</h3>
+      <p>لإضافة التطبيق إلى شاشة الـ iPhone الرئيسية، اتّبع الخطوات التالية:</p>
+      <div class="step"><span class="num">١</span><div>اضغط أيقونة <strong>المشاركة</strong> <span style="font-size:16px">⬆︎</span> في أسفل Safari.</div></div>
+      <div class="step"><span class="num">٢</span><div>مرّر للأسفل واختر <strong>"إضافة إلى الشاشة الرئيسية"</strong>.</div></div>
+      <div class="step"><span class="num">٣</span><div>اضغط <strong>"إضافة"</strong> في الأعلى — ستجد الأيقونة على شاشتك.</div></div>
+      <button type="button" id="uruk-ios-sheet-close">حسناً</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var installBtn = document.getElementById('uruk-install-btn');
+      var iosSheet   = document.getElementById('uruk-ios-sheet-bg');
+      var iosClose   = document.getElementById('uruk-ios-sheet-close');
+      var deferredPrompt = null;
+
+      // Hide immediately if running as installed PWA
+      var isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+      // Only show on pre-auth routes. Flutter uses client-side routing so the
+       // path changes without a page reload — we poll the URL.
+      var PREAUTH_ROUTES = /^\/(splash|onboarding|login|register|otp|privacy)?\/?$/;
+      function onPreAuthRoute() {
+        return PREAUTH_ROUTES.test(window.location.pathname);
+      }
+      function showBtn() {
+        if (isStandalone) return;
+        if (!onPreAuthRoute()) return;
+        installBtn.classList.add('visible');
+      }
+      function hideBtn() {
+        installBtn.classList.remove('visible');
+      }
+      // Re-evaluate visibility whenever Flutter routes
+      setInterval(function(){
+        if (!deferredPrompt && !(isIOS && isSafari)) return;
+        if (onPreAuthRoute()) showBtn(); else hideBtn();
+      }, 600);
+
+      // Chrome / Android — capture the prompt so we can show it on click
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        showBtn();
+      });
+
+      // Hide after user installs the app
+      window.addEventListener('appinstalled', function() {
+        deferredPrompt = null;
+        hideBtn();
+      });
+
+      // iOS Safari — no beforeinstallprompt, detect and show instructions
+      var ua = window.navigator.userAgent.toLowerCase();
+      var isIOS = /iphone|ipad|ipod/.test(ua);
+      var isSafari = /safari/.test(ua) && !/crios|fxios|edgios/.test(ua);
+      if (isIOS && isSafari && !isStandalone) {
+        // Show the pill after a short delay so Flutter has time to paint
+        setTimeout(showBtn, 2500);
+      }
+
+      installBtn.addEventListener('click', function(e) {
+        // If the user tapped the "×" dismiss pill, just hide and remember for this session
+        if (e.target && e.target.dataset && e.target.dataset.dismiss) {
+          hideBtn();
+          try { sessionStorage.setItem('uruk-install-dismissed', '1'); } catch(_) {}
+          return;
+        }
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(function() {
+            deferredPrompt = null;
+            hideBtn();
+          });
+        } else if (isIOS) {
+          iosSheet.classList.add('visible');
+        }
+      });
+
+      iosClose.addEventListener('click', function() {
+        iosSheet.classList.remove('visible');
+      });
+      iosSheet.addEventListener('click', function(e) {
+        if (e.target === iosSheet) iosSheet.classList.remove('visible');
+      });
+
+      // Respect this-session dismissal
+      try {
+        if (sessionStorage.getItem('uruk-install-dismissed') === '1') {
+          // Still listen for the prompt but don't auto-show
+          window.removeEventListener('beforeinstallprompt', showBtn);
+        }
+      } catch(_) {}
+    })();
+  </script>
+
+  <script src="flutter_bootstrap.js" async=""></script>
+
+
+</body></html>

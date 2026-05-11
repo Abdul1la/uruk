@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "952335168752",
+    "project_id": "uruk-f3491",
+    "storage_bucket": "uruk-f3491.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:952335168752:android:321157af65eb9a3bdb3e35",
+        "android_client_info": {
+          "package_name": "com.urukservices.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhnO1uXrsvhAThfvazARd6zOFzrxmm7no"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
