@@ -1099,6 +1099,26 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get profileLogoutConfirmContent => 'دڵنیایت کە دەتەوێت دەربچیت؟';
 
   @override
+  String get profileDeleteAccount => 'سڕینەوەی هەژمار';
+
+  @override
+  String get profileDeleteAccountConfirmTitle => 'هەژمارەکەت بسڕێتەوە؟';
+
+  @override
+  String get profileDeleteAccountConfirmContent =>
+      'ئەمە هەژمارەکەت و هەموو ئەو داتایانەی پەیوەستن بە تەواوی دەسڕێتەوە — پڕۆفایلەکەت، ئۆتۆمبێلەکانت، بەشداریکردنەکانت، پارەدانەکانت، کاتەکانت، و ڕاپۆرتی ڕووداوەکان. ناتوانرێت ئەم کردارە بگەڕێنرێتەوە.';
+
+  @override
+  String get profileDeleteAccountButton => 'هەژمارەکەم بسڕەوە';
+
+  @override
+  String get profileDeleteAccountSuccess => 'هەژمارەکەت سڕایەوە.';
+
+  @override
+  String get profileDeleteAccountError =>
+      'نەتوانرا هەژمارەکەت بسڕێتەوە. تکایە دووبارە هەوڵبدەوە.';
+
+  @override
   String get profileMemberFallback => 'ئەندام';
 
   @override

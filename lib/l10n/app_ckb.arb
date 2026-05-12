@@ -425,6 +425,12 @@
   "profileLogout": "چوونەدەرەوە",
   "profileLogoutConfirmTitle": "چوونەدەرەوە",
   "profileLogoutConfirmContent": "دڵنیایت کە دەتەوێت دەربچیت؟",
+  "profileDeleteAccount": "سڕینەوەی هەژمار",
+  "profileDeleteAccountConfirmTitle": "هەژمارەکەت بسڕێتەوە؟",
+  "profileDeleteAccountConfirmContent": "ئەمە هەژمارەکەت و هەموو ئەو داتایانەی پەیوەستن بە تەواوی دەسڕێتەوە — پڕۆفایلەکەت، ئۆتۆمبێلەکانت، بەشداریکردنەکانت، پارەدانەکانت، کاتەکانت، و ڕاپۆرتی ڕووداوەکان. ناتوانرێت ئەم کردارە بگەڕێنرێتەوە.",
+  "profileDeleteAccountButton": "هەژمارەکەم بسڕەوە",
+  "profileDeleteAccountSuccess": "هەژمارەکەت سڕایەوە.",
+  "profileDeleteAccountError": "نەتوانرا هەژمارەکەت بسڕێتەوە. تکایە دووبارە هەوڵبدەوە.",
   "profileMemberFallback": "ئەندام",
 
   "oilChangeTitle": "حجزی گۆڕینی زەیت",

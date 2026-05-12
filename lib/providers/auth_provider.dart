@@ -297,6 +297,36 @@ class AuthProvider extends ChangeNotifier {
     _setState(AuthState.unauthenticated);
   }
 
+  /// Permanently delete the signed-in user's account (App Store guideline
+  /// 5.1.1(v)). Calls the backend, then tears down the local session exactly
+  /// like [logout]. Returns true on success; on failure the session is left
+  /// intact and [errorMessage] is set.
+  Future<bool> deleteAccount() async {
+    try {
+      // Unregister this device for push before the token becomes invalid.
+      final tokenToRevoke = _lastRegisteredToken;
+      if (tokenToRevoke != null) {
+        unawaited(_service.unregisterDeviceToken(tokenToRevoke));
+      }
+      await _service.deleteAccount();
+      unawaited(FcmService.instance.deleteToken());
+      _lastRegisteredToken = null;
+      _user = null;
+      _otpSent = false;
+      _errorMessage = null;
+      _setState(AuthState.unauthenticated);
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
   void _setState(AuthState state) {
     _state = state;
     notifyListeners();

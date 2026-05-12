@@ -110,6 +110,20 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> _delete(String path) async {
+    await loadToken();
+    try {
+      final res = await http
+          .delete(Uri.parse('$_baseUrl$path'), headers: _headers)
+          .timeout(_timeout);
+      return _handleResponse(res);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException(_networkError(e), 0);
+    }
+  }
+
   /// Wraps raw socket/http errors into a friendly Arabic message. Keeps the
   /// status code at 0 so callers can distinguish "network failure" (0) from
   /// "server returned 4xx/5xx" (real status codes).
@@ -197,6 +211,16 @@ class ApiService {
     });
     await saveToken(data['token']);
     return _parseUser(data['user']);
+  }
+
+  /// Permanently delete the signed-in user's account and all associated data.
+  ///
+  /// Backend contract: `DELETE /auth/account` (auth header carries the user
+  /// id). On success the token is no longer valid, so the caller must clear
+  /// local session state immediately after this returns.
+  Future<void> deleteAccount() async {
+    await _delete('/auth/account');
+    await clearToken();
   }
 
   Future<UserModel> uploadIdImages({

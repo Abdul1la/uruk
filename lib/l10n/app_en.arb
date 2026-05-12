@@ -425,6 +425,12 @@
   "profileLogout": "Logout",
   "profileLogoutConfirmTitle": "Logout",
   "profileLogoutConfirmContent": "Are you sure you want to log out?",
+  "profileDeleteAccount": "Delete Account",
+  "profileDeleteAccountConfirmTitle": "Delete your account?",
+  "profileDeleteAccountConfirmContent": "This will permanently delete your account and all related data — your profile, cars, subscriptions, payments, appointments, and accident reports. This action cannot be undone.",
+  "profileDeleteAccountButton": "Delete My Account",
+  "profileDeleteAccountSuccess": "Your account has been deleted.",
+  "profileDeleteAccountError": "Could not delete your account. Please try again.",
   "profileMemberFallback": "Member",
 
   "oilChangeTitle": "Oil Change Booking",

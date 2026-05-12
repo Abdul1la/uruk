@@ -349,6 +349,12 @@
   "profileLogout": "تسجيل الخروج",
   "profileLogoutConfirmTitle": "تسجيل الخروج",
   "profileLogoutConfirmContent": "هل أنت متأكد من تسجيل الخروج؟",
+  "profileDeleteAccount": "حذف الحساب",
+  "profileDeleteAccountConfirmTitle": "حذف حسابك؟",
+  "profileDeleteAccountConfirmContent": "سيؤدي هذا إلى حذف حسابك نهائيًا وجميع البيانات المرتبطة به — ملفك الشخصي، سياراتك، اشتراكاتك، مدفوعاتك، مواعيدك، وبلاغات الحوادث. لا يمكن التراجع عن هذا الإجراء.",
+  "profileDeleteAccountButton": "حذف حسابي",
+  "profileDeleteAccountSuccess": "تم حذف حسابك.",
+  "profileDeleteAccountError": "تعذّر حذف حسابك. حاول مرة أخرى.",
   "profileMemberFallback": "عضو",
 
   "oilChangeTitle": "حجز تغيير الزيت",

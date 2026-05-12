@@ -86,6 +86,18 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
+
+            // ── Delete account (App Store guideline 5.1.1(v)) ───────────
+            TextButton.icon(
+              onPressed: () => _confirmDeleteAccount(context, auth),
+              icon: const Icon(Icons.delete_forever_outlined, color: AppColors.error, size: 20),
+              label: Text(
+                l.profileDeleteAccount,
+                style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600),
+              ),
+              style: TextButton.styleFrom(minimumSize: const Size(double.infinity, 44)),
+            ),
+            const SizedBox(height: 8),
             Text(l.appVersion, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
             const SizedBox(height: 20),
           ],
@@ -254,6 +266,50 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount(BuildContext context, AuthProvider auth) {
+    final l = context.l10n;
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        icon: const Icon(Icons.delete_forever_outlined, color: AppColors.error, size: 32),
+        title: Text(l.profileDeleteAccountConfirmTitle),
+        content: Text(l.profileDeleteAccountConfirmContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text(l.commonCancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(dialogCtx);
+              // Block the UI while the request is in flight.
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => const Center(child: CircularProgressIndicator()),
+              );
+              final ok = await auth.deleteAccount();
+              if (!context.mounted) return;
+              Navigator.pop(context); // dismiss the spinner
+              if (ok) {
+                context.go('/login');
+                Helpers.showSnackBar(context, l.profileDeleteAccountSuccess);
+              } else {
+                Helpers.showSnackBar(
+                  context,
+                  auth.errorMessage ?? l.profileDeleteAccountError,
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: Text(l.profileDeleteAccountButton, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }

@@ -2062,6 +2062,42 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to log out?'**
   String get profileLogoutConfirmContent;
 
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @profileDeleteAccountConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get profileDeleteAccountConfirmTitle;
+
+  /// No description provided for @profileDeleteAccountConfirmContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete your account and all related data — your profile, cars, subscriptions, payments, appointments, and accident reports. This action cannot be undone.'**
+  String get profileDeleteAccountConfirmContent;
+
+  /// No description provided for @profileDeleteAccountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete My Account'**
+  String get profileDeleteAccountButton;
+
+  /// No description provided for @profileDeleteAccountSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been deleted.'**
+  String get profileDeleteAccountSuccess;
+
+  /// No description provided for @profileDeleteAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete your account. Please try again.'**
+  String get profileDeleteAccountError;
+
   /// No description provided for @profileMemberFallback.
   ///
   /// In en, this message translates to:
