@@ -158,6 +158,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginRegister => 'Register';
 
   @override
+  String get loginContinueAsGuest => 'Browse as Guest';
+
+  @override
+  String get guestBannerMessage => 'Browsing as guest';
+
+  @override
+  String get guestBannerAction => 'Login';
+
+  @override
+  String get guestLoginRequired => 'Login Required';
+
+  @override
+  String get guestLoginRequiredMessage =>
+      'You need to log in to access this feature.';
+
+  @override
+  String get guestLoginButton => 'Login';
+
+  @override
   String get registerTitle => 'Create your account';
 
   @override

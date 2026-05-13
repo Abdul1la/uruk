@@ -26,6 +26,11 @@ class ApiService {
   factory ApiService() => _instance;
   ApiService._();
 
+  /// True while the user is browsing as a guest (no token). The router
+  /// reads this to let guest users through to `/home` without redirecting
+  /// to `/login`.
+  static bool isGuestMode = false;
+
   // ── Configuration ──
   // Production: uruk-services.com (Spaceship hosting)
   // Override for local testing: --dart-define=API_URL=http://localhost:3000/api

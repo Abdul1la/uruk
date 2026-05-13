@@ -186,7 +186,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   icon: Icons.person_add_outlined,
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
+
+                // Continue as Guest
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: isLoading ? null : () {
+                      context.read<AuthProvider>().enterGuestMode();
+                      context.go('/home');
+                    },
+                    icon: const Icon(Icons.visibility_outlined, size: 18, color: AppColors.textSecondary),
+                    label: Text(
+                      l.loginContinueAsGuest,
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
 
                 // Privacy Policy notice + link
                 Center(

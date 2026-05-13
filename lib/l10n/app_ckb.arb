@@ -53,6 +53,12 @@
   "loginSignInButton": "چوونەژوورەوە",
   "loginNoAccount": "ئەکاونتت نییە؟",
   "loginRegister": "تۆمارکردن",
+  "loginContinueAsGuest": "وەک میوان بگەڕێ",
+  "guestBannerMessage": "وەک میوان دەگەڕێیت",
+  "guestBannerAction": "چوونەژوورەوە",
+  "guestLoginRequired": "چوونەژوورەوە پێویستە",
+  "guestLoginRequiredMessage": "دەبێت بچیتە ژوورەوە بۆ دەستگەیشتن بە ئەم تایبەتمەندییە.",
+  "guestLoginButton": "چوونەژوورەوە",
 
   "registerTitle": "ئەکاونتەکەت دروستبکە",
   "registerSubtitle": "زانیارییەکانت پڕبکەرەوە بۆ دەستپێکردن.",

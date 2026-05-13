@@ -158,6 +158,25 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get loginRegister => 'تۆمارکردن';
 
   @override
+  String get loginContinueAsGuest => 'وەک میوان بگەڕێ';
+
+  @override
+  String get guestBannerMessage => 'وەک میوان دەگەڕێیت';
+
+  @override
+  String get guestBannerAction => 'چوونەژوورەوە';
+
+  @override
+  String get guestLoginRequired => 'چوونەژوورەوە پێویستە';
+
+  @override
+  String get guestLoginRequiredMessage =>
+      'دەبێت بچیتە ژوورەوە بۆ دەستگەیشتن بە ئەم تایبەتمەندییە.';
+
+  @override
+  String get guestLoginButton => 'چوونەژوورەوە';
+
+  @override
   String get registerTitle => 'ئەکاونتەکەت دروستبکە';
 
   @override

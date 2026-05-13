@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../core/l10n/l10n.dart';
 import '../core/theme/app_colors.dart';
+import '../providers/auth_provider.dart';
 
 class UrukBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -11,6 +13,7 @@ class UrukBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
+    final isGuest = context.watch<AuthProvider>().isGuest;
     final items = [
       _NavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: l.navHome, route: '/home'),
       _NavItem(icon: Icons.car_crash_outlined, activeIcon: Icons.car_crash, label: l.navAccidents, route: '/accidents'),
@@ -35,32 +38,77 @@ class UrukBottomNavBar extends StatelessWidget {
               return Expanded(
                 child: InkWell(
                   onTap: () {
-                    // Preserve back stack when switching tabs: push unless we're
-                    // already on this tab (avoid stacking duplicates of same tab).
+                    // Guest users can only stay on /home — show login prompt for other tabs.
+                    if (item.route != '/home' && context.read<AuthProvider>().isGuest) {
+                      final l = context.l10n;
+                      showDialog(
+                        context: context,
+                        builder: (dlgCtx) => AlertDialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          title: Row(children: [
+                            const Icon(Icons.lock_outline, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(l.guestLoginRequired)),
+                          ]),
+                          content: Text(l.guestLoginRequiredMessage),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(dlgCtx), child: Text(l.commonCancel)),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(dlgCtx);
+                                context.read<AuthProvider>().logout();
+                                context.go('/login');
+                              },
+                              child: Text(l.guestLoginButton),
+                            ),
+                          ],
+                        ),
+                      );
+                      return;
+                    }
+                    // Preserve back stack when switching tabs.
                     final current = GoRouterState.of(context).uri.path;
                     if (current != item.route) {
                       context.push(item.route);
                     }
                   },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Stack(
+                    clipBehavior: Clip.none,
                     children: [
-                      Icon(
-                        selected ? item.activeIcon : item.icon,
-                        color: selected ? AppColors.primary : AppColors.textSecondary,
-                        size: 22,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            selected ? item.activeIcon : item.icon,
+                            color: selected ? AppColors.primary : AppColors.textSecondary,
+                            size: 22,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            item.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                              color: selected ? AppColors.primary : AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                          color: selected ? AppColors.primary : AppColors.textSecondary,
+                      if (isGuest && item.route != '/home')
+                        Positioned(
+                          right: -2,
+                          top: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: AppColors.surface,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.lock_rounded, size: 9, color: AppColors.textSecondary),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),

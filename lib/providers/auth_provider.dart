@@ -13,6 +13,7 @@ enum AuthState {
   suspended,
   rejected,
   error,
+  guest,
 }
 
 class AuthProvider extends ChangeNotifier {
@@ -26,6 +27,7 @@ class AuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get otpSent => _otpSent;
   bool get isAuthenticated => _state == AuthState.authenticated;
+  bool get isGuest => _state == AuthState.guest;
   bool get isPending => _user?.status == UserStatus.pending;
   bool get isSuspended => _user?.status == UserStatus.suspended;
   bool get isRejected => _user?.status == UserStatus.rejected;
@@ -280,6 +282,13 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Enter guest mode: browse the app (limited to `/home`) without an
+  /// account. The router checks `ApiService.isGuestMode` to allow it through.
+  void enterGuestMode() {
+    ApiService.isGuestMode = true;
+    _setState(AuthState.guest);
+  }
+
   void logout() {
     // Tell the backend to forget this device first, then drop the FCM token
     // locally so the next login negotiates a fresh one.
@@ -294,6 +303,7 @@ class AuthProvider extends ChangeNotifier {
     _otpSent = false;
     _errorMessage = null;
     _service.clearToken();
+    ApiService.isGuestMode = false;
     _setState(AuthState.unauthenticated);
   }
 
@@ -314,6 +324,7 @@ class AuthProvider extends ChangeNotifier {
       _user = null;
       _otpSent = false;
       _errorMessage = null;
+      ApiService.isGuestMode = false;
       _setState(AuthState.unauthenticated);
       return true;
     } on ApiException catch (e) {

@@ -52,8 +52,12 @@ final appRouter = GoRouter(
     if (path == '/splash') return null;
     // Allow any public route without a token.
     if (_publicRoutes.contains(path)) return null;
-    // No token at all → kick to login. (ApiService keeps the token in memory
-    // after loadToken() is called once; the splash screen calls it first.)
+    // Guest mode: only /home is accessible; everything else redirects home.
+    if (ApiService.isGuestMode) {
+      if (path == '/home') return null;
+      return '/home';
+    }
+    // No token at all → kick to login.
     if (!ApiService().hasToken) return '/login';
     // Otherwise allow — per-screen checks (pending/suspended/rejected) are
     // handled by MainShell and individual screens that read AuthProvider.

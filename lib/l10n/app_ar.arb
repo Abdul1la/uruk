@@ -53,6 +53,12 @@
   "loginSignInButton": "تسجيل الدخول",
   "loginNoAccount": "لا تملك حساباً؟",
   "loginRegister": "إنشاء حساب",
+  "loginContinueAsGuest": "تصفح كزائر",
+  "guestBannerMessage": "أنت تتصفح كزائر",
+  "guestBannerAction": "تسجيل الدخول",
+  "guestLoginRequired": "تسجيل الدخول مطلوب",
+  "guestLoginRequiredMessage": "يجب تسجيل الدخول للوصول إلى هذه الميزة.",
+  "guestLoginButton": "تسجيل الدخول",
 
   "registerTitle": "أنشئ حسابك",
   "registerSubtitle": "أملأ بياناتك للبدء.",

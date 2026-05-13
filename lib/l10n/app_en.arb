@@ -53,6 +53,12 @@
   "loginSignInButton": "Sign In",
   "loginNoAccount": "Don't have an account?",
   "loginRegister": "Register",
+  "loginContinueAsGuest": "Browse as Guest",
+  "guestBannerMessage": "Browsing as guest",
+  "guestBannerAction": "Login",
+  "guestLoginRequired": "Login Required",
+  "guestLoginRequiredMessage": "You need to log in to access this feature.",
+  "guestLoginButton": "Login",
 
   "registerTitle": "Create your account",
   "registerSubtitle": "Fill in your details to get started.",

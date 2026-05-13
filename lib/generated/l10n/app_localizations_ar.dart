@@ -158,6 +158,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginRegister => 'إنشاء حساب';
 
   @override
+  String get loginContinueAsGuest => 'تصفح كزائر';
+
+  @override
+  String get guestBannerMessage => 'أنت تتصفح كزائر';
+
+  @override
+  String get guestBannerAction => 'تسجيل الدخول';
+
+  @override
+  String get guestLoginRequired => 'تسجيل الدخول مطلوب';
+
+  @override
+  String get guestLoginRequiredMessage =>
+      'يجب تسجيل الدخول للوصول إلى هذه الميزة.';
+
+  @override
+  String get guestLoginButton => 'تسجيل الدخول';
+
+  @override
   String get registerTitle => 'أنشئ حسابك';
 
   @override

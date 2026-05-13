@@ -394,6 +394,42 @@ abstract class AppLocalizations {
   /// **'Register'**
   String get loginRegister;
 
+  /// No description provided for @loginContinueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse as Guest'**
+  String get loginContinueAsGuest;
+
+  /// No description provided for @guestBannerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Browsing as guest'**
+  String get guestBannerMessage;
+
+  /// No description provided for @guestBannerAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get guestBannerAction;
+
+  /// No description provided for @guestLoginRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Login Required'**
+  String get guestLoginRequired;
+
+  /// No description provided for @guestLoginRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to log in to access this feature.'**
+  String get guestLoginRequiredMessage;
+
+  /// No description provided for @guestLoginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get guestLoginButton;
+
   /// No description provided for @registerTitle.
   ///
   /// In en, this message translates to:

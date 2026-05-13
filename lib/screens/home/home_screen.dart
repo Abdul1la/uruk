@@ -23,11 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // One-time full data load on screen entry. The global AutoRefresher
-    // (wired in main.dart) handles periodic re-fetches after that.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final user = context.read<AuthProvider>().user;
-      if (user != null) context.read<AppProvider>().loadAll(user.id);
+      final auth = context.read<AuthProvider>();
+      if (!auth.isGuest && auth.user != null) {
+        context.read<AppProvider>().loadAll(auth.user!.id);
+      }
     });
   }
 
@@ -45,22 +45,30 @@ class _HomeScreenState extends State<HomeScreen> {
         slivers: [
           // ── Header ───────────────────────────────────────────────────────
           SliverToBoxAdapter(
-            child: _Header(user: user, car: car, unreadCount: app.unreadCount),
+            child: _Header(user: user, car: car, unreadCount: app.unreadCount, isGuest: auth.isGuest),
           ),
 
-          // ── Subscription card ─────────────────────────────────────────────
+          // ── Guest banner ──────────────────────────────────────────────────
+          if (auth.isGuest)
+            SliverToBoxAdapter(
+              child: _GuestBanner(),
+            ),
+
+          // ── Subscription card / Guest promo ───────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Builder(
-                builder: (_) {
-                  final pending = car != null &&
-                          app.pendingUpgradeRequest?.carId == car.id
-                      ? app.pendingUpgradeRequest
-                      : null;
-                  return _SubscriptionCard(car: car, pendingForCar: pending);
-                },
-              ),
+              child: auth.isGuest
+                  ? const _GuestPromoCard()
+                  : Builder(
+                      builder: (_) {
+                        final pending = car != null &&
+                                app.pendingUpgradeRequest?.carId == car.id
+                            ? app.pendingUpgradeRequest
+                            : null;
+                        return _SubscriptionCard(car: car, pendingForCar: pending);
+                      },
+                    ),
             ),
           ),
 
@@ -87,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: _QuickActions(),
+              child: _QuickActions(isGuest: auth.isGuest),
             ),
           ),
 
@@ -153,7 +161,8 @@ class _Header extends StatelessWidget {
   final UserModel? user;
   final CarInfo? car;
   final int unreadCount;
-  const _Header({this.user, this.car, required this.unreadCount});
+  final bool isGuest;
+  const _Header({this.user, this.car, required this.unreadCount, this.isGuest = false});
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +242,7 @@ class _Header extends StatelessWidget {
             style: const TextStyle(color: Colors.white70, fontSize: 13),
           ),
           Text(
-            user?.fullName.split(' ').first ?? l.homeMemberFallback,
+            isGuest ? l.guestBannerMessage : (user?.fullName.split(' ').first ?? l.homeMemberFallback),
             style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
           ),
           if (car != null) ...[
@@ -598,6 +607,141 @@ class _ActiveSub extends StatelessWidget {
   }
 }
 
+// ── Guest Banner ──────────────────────────────────────────────────────────────
+
+class _GuestBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.primarySurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.visibility_outlined, color: AppColors.primary, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              l.guestBannerMessage,
+              style: const TextStyle(fontSize: 13, color: AppColors.primary, fontWeight: FontWeight.w500),
+            ),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            onPressed: () {
+              context.read<AuthProvider>().logout();
+              context.go('/login');
+            },
+            child: Text(l.guestBannerAction, style: const TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Guest Promo Card ──────────────────────────────────────────────────────────
+
+class _GuestPromoCard extends StatelessWidget {
+  const _GuestPromoCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return Transform.translate(
+      offset: const Offset(0, -16),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [AppColors.primary, AppColors.primaryLight],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 16, offset: Offset(0, 4))],
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.card_membership_outlined, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.homeMySubscription,
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                      ),
+                      const Text(
+                        'Uruk Motors',
+                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: Colors.white24, height: 0),
+            const SizedBox(height: 14),
+            for (final feature in const [
+              (Icons.verified_outlined, 'خطط اشتراك مرنة لسيارتك'),
+              (Icons.build_circle_outlined, 'صيانة دورية وتغيير زيت'),
+              (Icons.car_crash_outlined, 'تقارير حوادث فورية'),
+            ]) ...[
+              Row(
+                children: [
+                  Icon(feature.$1, color: Colors.white70, size: 15),
+                  const SizedBox(width: 8),
+                  Text(feature.$2, style: const TextStyle(color: Colors.white, fontSize: 12)),
+                ],
+              ),
+              const SizedBox(height: 6),
+            ],
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  context.read<AuthProvider>().logout();
+                  context.go('/login');
+                },
+                child: Text(l.guestBannerAction, style: const TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _NoSub extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -660,6 +804,9 @@ class _PaymentAlert extends StatelessWidget {
 // ── Quick Actions ─────────────────────────────────────────────────────────────
 
 class _QuickActions extends StatelessWidget {
+  final bool isGuest;
+  const _QuickActions({this.isGuest = false});
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -680,7 +827,7 @@ class _QuickActions extends StatelessWidget {
           children: actions.map((a) => Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: _QuickActionBtn(action: a),
+              child: _QuickActionBtn(action: a, isGuest: isGuest),
             ),
           )).toList(),
         ),
@@ -699,9 +846,42 @@ class _QuickAction {
 
 class _QuickActionBtn extends StatelessWidget {
   final _QuickAction action;
-  const _QuickActionBtn({required this.action});
+  final bool isGuest;
+  const _QuickActionBtn({required this.action, this.isGuest = false});
+
+  void _showGuestDialog(BuildContext context) {
+    final l = context.l10n;
+    showDialog(
+      context: context,
+      builder: (dlgCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(children: [
+          const Icon(Icons.lock_outline, color: AppColors.primary, size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Text(l.guestLoginRequired)),
+        ]),
+        content: Text(l.guestLoginRequiredMessage),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dlgCtx), child: Text(l.commonCancel)),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dlgCtx);
+              context.read<AuthProvider>().logout();
+              context.go('/login');
+            },
+            child: Text(l.guestLoginButton),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _onTap(BuildContext context) {
+    // Guest users can't use any action
+    if (context.read<AuthProvider>().isGuest) {
+      _showGuestDialog(context);
+      return;
+    }
     // Block accident report if user has no active subscription
     if (action.route == '/accidents/report') {
       final car = context.read<AppProvider>().selectedCar ??
@@ -737,37 +917,55 @@ class _QuickActionBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => _onTap(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.divider),
-          boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2))],
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 44, height: 44,
-              decoration: BoxDecoration(
-                color: action.color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(action.icon, color: action.color, size: 22),
+      child: Stack(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.divider),
+              boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2))],
             ),
-            const SizedBox(height: 8),
-            Text(
-              action.label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-                height: 1.3,
+            child: Column(
+              children: [
+                Container(
+                  width: 44, height: 44,
+                  decoration: BoxDecoration(
+                    color: action.color.withValues(alpha: isGuest ? 0.05 : 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(action.icon, color: action.color.withValues(alpha: isGuest ? 0.4 : 1.0), size: 22),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  action.label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: isGuest ? AppColors.textSecondary : AppColors.textPrimary,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isGuest)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.divider),
+                ),
+                child: const Icon(Icons.lock_rounded, size: 10, color: AppColors.textSecondary),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
